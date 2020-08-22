@@ -2,8 +2,10 @@ package controllers;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -11,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import models.Task;
+import models.validators.TaskValidator;
 import utils.DBUtil;
 
 /**
@@ -56,22 +59,43 @@ public class UpdateServlet extends HttpServlet {
             t.setUpdated_at(currentTime);
 
 
-            // DBを更新
-            em.getTransaction().begin();
-            em.getTransaction().commit();
+            // バリデーションを実行、エラー有りなら編集画面に戻る
+            List<String> errors = TaskValidator.validate(t);
 
-            // flushメッセージを表示
-            request.getSession().setAttribute("flush", "更新が完了しました。");
+            if(errors.size() > 0) {
+                em.close();
 
-            em.close();
+                // フォームに初期値を設定し、エラーメッセージを送る
+                request.setAttribute("_token", request.getSession().getId());
+                request.setAttribute("task", t);
+                request.setAttribute("errors", errors);
+
+                RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/tasks/edit.jsp");
+                rd.forward(request, response);
+            } else {
+
+                // DBを更新
+                em.getTransaction().begin();
+                em.getTransaction().commit();
+
+                // flushメッセージを表示
+                request.getSession().setAttribute("flush", "更新が完了しました。");
+
+                em.close();
 
 
-            // セッションスコープ上で不要になったデータを削除
-            request.getSession().removeAttribute("task_id");
+                // セッションスコープ上で不要になったデータを削除
+                request.getSession().removeAttribute("task_id");
 
 
-            // indexページへリダイレクト
-            response.sendRedirect(request.getContextPath() + "/index");
+                // indexページへリダイレクト
+                response.sendRedirect(request.getContextPath() + "/index");
+
+
+            }
+
+
+
         }
 
     }
