@@ -57,6 +57,10 @@ public class CreateServlet extends HttpServlet {
             em.getTransaction().begin();
             em.persist(t);
             em.getTransaction().commit();
+
+            // flushメッセージを表示
+            request.getSession().setAttribute("flush", "登録が完了しました。");
+
             em.close();
 
             response.sendRedirect(request.getContextPath() + "/index");

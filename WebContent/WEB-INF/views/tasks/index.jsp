@@ -5,22 +5,28 @@
 <c:import url="../layout/app.jsp">
     <c:param name="content">
 
-      <h2>タスク一覧</h2>
-      <ul>
-
-          <c:forEach var="task" items="${tasks}">
-
-              <li>
-                  <a href="${pageContext.request.contextPath}/show?id=${task.id}">
-                      <c:out value="${task.id}" />
-                  </a>
-                  : <c:out value="${task.content}" />
-              </li>
-          </c:forEach>
-      </ul>
+        <c:if test="${flush != nul}">
+            <div id="flush_success">
+                <c:out value="${flush}"></c:out>
+            </div>
+        </c:if>
 
 
-      <p><a href="${pageContext.request.contextPath}/new">新規タスクの投稿</a></p>
+        <h2>タスク一覧</h2>
+        <ul>
+            <c:forEach var="task" items="${tasks}">
+
+                <li>
+                    <a href="${pageContext.request.contextPath}/show?id=${task.id}">
+                        <c:out value="${task.id}" />
+                    </a>
+                    : <c:out value="${task.content}" />
+                </li>
+            </c:forEach>
+        </ul>
+
+
+        <p><a href="${pageContext.request.contextPath}/new">新規タスクの投稿</a></p>
 
 
     </c:param>
